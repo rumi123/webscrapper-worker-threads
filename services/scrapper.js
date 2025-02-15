@@ -1,11 +1,12 @@
 import puppeteer from 'puppeteer';
 import { parentPort, workerData } from 'worker_threads'
 import { PAGE_STATUS_ENUMS } from '../constants/pageStatus.Enum.js';
-import { pageProcessingStatusHandler } from '../utils/scrapperStatesHandler.js';
+import { pageProcessingStatusHandler } from './scrapperStatesHandler.js';
 import { scrappeAmazonPageData } from './jobs/amazon-scrapper.job.js';
+import { getFailedPagesByPageNumberRange } from './pageStatusDB.services.js';
+import { getArrayFromArrayOfObjects } from '../utils/getArrayFromArrayofObjects.js';
 
 const scrapper = async (pageIndexes) => {
-
     const { start, end } = pageIndexes
     console.log(pageIndexes);
     try {
@@ -21,10 +22,36 @@ const scrapper = async (pageIndexes) => {
             }
         }
         browser.close()
+        await scrappFailedPages(pageIndexes)
         parentPort.postMessage('success')
     } catch (error) {
         throw 'failed'
     }
+}
+
+const scrappFailedPages = async () => {
+    try {
+        const failedPagesData = await getFailedPagesByPageNumberRange(pageIndexes)
+        const arrayOfPageNumbers = getArrayFromArrayOfObjects(failedPagesData, 'pageNumber')
+        const browser = await puppeteer.launch()
+        while (arrayOfPageNumbers.length > 0) {
+            for (let i = 0; i < arrayOfPageNumbers.length; i++) {
+                try {
+                    const pageNumber = arrayOfPageNumbers[i]
+                    await pageProcessingStatusHandler(pageNumber, PAGE_STATUS_ENUMS.PROCESSING)
+                    await scrappeAmazonPageData(pageNumber, browser)
+                    await pageProcessingStatusHandler(pageNumber, PAGE_STATUS_ENUMS.SUCCESS)
+                } catch (error) {
+                    console.log(`page ${pageNumber}`, error);
+                    pageProcessingStatusHandler(pageNumber, PAGE_STATUS_ENUMS.FAILED)
+                }
+            }
+        }
+        browser.close()
+    } catch (error) {
+        throw error
+    }
+
 }
 
 scrapper(workerData.pageIndexes)

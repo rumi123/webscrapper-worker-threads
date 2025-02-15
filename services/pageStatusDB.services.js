@@ -1,3 +1,5 @@
+import { Op } from "sequelize"
+import { PAGE_STATUS_ENUMS } from "../constants/pageStatus.Enum.js"
 import { PageStatus } from "../models/pageStatus.js"
 
 export const getAllPagesStatus = async () => {
@@ -6,6 +8,11 @@ export const getAllPagesStatus = async () => {
 
 export const getPageStatusByPageNumber = async (pageNumber) => {
     return await PageStatus.findOne({ where: { pageNumber }, attributes: ['pageNumber', 'status'], raw: true })
+}
+
+export const getFailedPagesByPageNumberRange = async (range) => {
+    const { start, end } = range
+    return await PageStatus.findAll({ where: { pageNumber: { [Op.between]: [start, end] }, status: PAGE_STATUS_ENUMS.FAILED }, raw: true })
 }
 
 export const getPageStatusByStatus = async (status) => {

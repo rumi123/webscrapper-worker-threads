@@ -1,5 +1,5 @@
 import { PAGE_STATUS_ENUMS } from "../constants/pageStatus.Enum.js"
-import { createPageStatus, getPageStatusByPageNumber, updatePageStatus } from "../services/pageStatusDB.services.js"
+import { createPageStatus, getPageStatusByPageNumber, updatePageStatus } from "./pageStatusDB.services.js"
 
 export const pageProcessingStatusHandler = async (pageNumber, status) => {
     try {
