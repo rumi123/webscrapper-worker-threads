@@ -11,14 +11,17 @@ const NUM_WORKERS = os.cpus().length
 
 const app = express()
 
+await sequelizeAmazonScrapperDb.sync().then(console.log('synced')).catch(err => console.log(err))
+await sequelizePageStatusDB.sync()
+
 app.use(pageStatusRouter)
 
-const arrayOfPages = generatePagesArray(200, NUM_WORKERS)
+const arrayOfPages = generatePagesArray(120, NUM_WORKERS)
 
 const workerSetup = async () => {
     return new Promise((resolve, reject) => {
         if (isMainThread) {
-            const completedWorkers = 0
+            let completedWorkers = 0
             for (let i = 1; i <= NUM_WORKERS; i++) {
                 const worker = new Worker('./services/scrapper.js', { workerData: { pageIndexes: arrayOfPages[i - 1] } })
                 worker.on('message', (msg) => {
@@ -37,7 +40,6 @@ const workerSetup = async () => {
 
 workerSetup()
 
-await sequelizeAmazonScrapperDb.sync()
-await sequelizePageStatusDB.sync()
+
 app.listen(3000, () => console.log('running on port 3000'))
 

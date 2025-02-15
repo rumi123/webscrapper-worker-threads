@@ -25,19 +25,21 @@ const scrapper = async (pageIndexes) => {
         await scrappFailedPages(pageIndexes)
         parentPort.postMessage('success')
     } catch (error) {
+        console.log(error);
         throw 'failed'
     }
 }
 
-const scrappFailedPages = async () => {
+const scrappFailedPages = async (pageIndexes) => {
     try {
         const failedPagesData = await getFailedPagesByPageNumberRange(pageIndexes)
         const arrayOfPageNumbers = getArrayFromArrayOfObjects(failedPagesData, 'pageNumber')
         const browser = await puppeteer.launch()
         while (arrayOfPageNumbers.length > 0) {
             for (let i = 0; i < arrayOfPageNumbers.length; i++) {
+                const pageNumber = arrayOfPageNumbers[i]
                 try {
-                    const pageNumber = arrayOfPageNumbers[i]
+                    console.log(`started failed page ${pageNumber}`);
                     await pageProcessingStatusHandler(pageNumber, PAGE_STATUS_ENUMS.PROCESSING)
                     await scrappeAmazonPageData(pageNumber, browser)
                     await pageProcessingStatusHandler(pageNumber, PAGE_STATUS_ENUMS.SUCCESS)

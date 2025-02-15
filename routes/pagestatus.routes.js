@@ -1,9 +1,10 @@
 import express from "express";
+import { getAllPagesStatus } from "../services/pageStatusDB.services.js";
 
 const pageStatusRouter = express.Router()
 
 pageStatusRouter.get('/page-status/all', async (req, res) => {
-    const data = await PageStatus.findAll({ raw: true })
+    const data = await getAllPagesStatus()
     res.send(data)
 })
 

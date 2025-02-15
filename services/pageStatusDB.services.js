@@ -1,6 +1,6 @@
 import { Op } from "sequelize"
 import { PAGE_STATUS_ENUMS } from "../constants/pageStatus.Enum.js"
-import { PageStatus } from "../models/pageStatus.js"
+import { PageStatus } from "../models/index.js"
 
 export const getAllPagesStatus = async () => {
     return await PageStatus.findAll({ attributes: ['pageNumber', 'status'], raw: true })
@@ -23,6 +23,6 @@ export const createPageStatus = async (data) => {
     return await PageStatus.create(data)
 }
 
-export const updatePageStatus = async (pageNumber, status) => {
+export const updatePageStatus = async (pageNumber, status, errorLog) => {
     return await PageStatus.update({ status }, { where: { pageNumber } })
 }

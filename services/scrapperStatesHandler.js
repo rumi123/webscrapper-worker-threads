@@ -1,22 +1,18 @@
 import { PAGE_STATUS_ENUMS } from "../constants/pageStatus.Enum.js"
+import { checkPageStatusCanBeUpdated } from "../utils/canUpdateStatus.js"
 import { createPageStatus, getPageStatusByPageNumber, updatePageStatus } from "./pageStatusDB.services.js"
 
-export const pageProcessingStatusHandler = async (pageNumber, status) => {
+export const pageProcessingStatusHandler = async (pageNumber, status, errorLog) => {
     try {
         const pageStatusData = await getPageStatusByPageNumber(pageNumber)
         if (pageStatusData) {
-            if (pageStatusData.status === PAGE_STATUS_ENUMS.PROCESSING && [PAGE_STATUS_ENUMS.SUCCESS, PAGE_STATUS_ENUMS.FAILED].includes(status)) {
-                await updatePageStatus(pageNumber, status)
+            const pageStatusCanBeUpdated = checkPageStatusCanBeUpdated(pageStatusData.status, status)
+            if (pageStatusCanBeUpdated) {
+                await updatePageStatus(pageNumber, status, errorLog)
             }
-            if (pageStatusData.status === PAGE_STATUS_ENUMS.PROCESSING && status === PAGE_STATUS_ENUMS.PROCESSING) {
-                return
-            }
-        } else {
-            if (status === PAGE_STATUS_ENUMS.PROCESSING) {
-                await createPageStatus({ pageNumber, status })
-            } else {
-                return
-            }
+        }
+        else {
+            await createPageStatus({ pageNumber, status, errorLog })
         }
     } catch (error) {
         console.log(error);

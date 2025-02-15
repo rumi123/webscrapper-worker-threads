@@ -1,5 +1,4 @@
 import { Sequelize } from "sequelize";
-import { fileURLToPath } from 'url'
 import path from "path";
 
 const __dirname = path.resolve()
