@@ -1,0 +1,7 @@
+export const PAGE_STATUS_ENUMS = {
+    PROCESSING: 'PROCESSING',
+    SUCCESS: 'SUCCESS',
+    FAILED: 'FAILED'
+}
+
+export const PAGE_STATUS_ARRAY = Object.keys(PAGE_STATUS_ENUMS)
