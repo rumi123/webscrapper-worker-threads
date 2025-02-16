@@ -5,6 +5,7 @@ import { generatePagesArray } from "./utils/createPagesArray.js";
 import sequelizePageStatusDB from "./config/database.js";
 import sequelizeAmazonScrapperDb from "./config/jobs/amazon-database.job.js";
 import pageStatusRouter from "./routes/pagestatus.routes.js";
+import { checkIfAttemptLimitExceeded } from "./utils/checkAttempts.js";
 
 const NUM_WORKERS = os.cpus().length
 
@@ -16,7 +17,7 @@ await sequelizePageStatusDB.sync()
 
 app.use(pageStatusRouter)
 
-const arrayOfPages = generatePagesArray(120, NUM_WORKERS)
+const arrayOfPages = generatePagesArray(30, NUM_WORKERS)
 
 const workerSetup = async () => {
     return new Promise((resolve, reject) => {
@@ -39,6 +40,7 @@ const workerSetup = async () => {
 
 
 workerSetup()
+// checkIfAttemptLimitExceeded()
 
 
 app.listen(3000, () => console.log('running on port 3000'))

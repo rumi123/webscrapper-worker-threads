@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllPagesStatus } from "../services/pageStatusDB.services.js";
+import { getAllPagesStatus, getPageStatusByPageNumber, getPageStatusByStatus } from "../services/pageStatusDB.services.js";
 
 const pageStatusRouter = express.Router()
 

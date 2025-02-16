@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, DATE } from "sequelize";
 import { PAGE_STATUS_ARRAY } from "../constants/pageStatus.Enum.js";
 import sequelizePageStatusDB from "../config/database.js";
 import sequelizeAmazonScrapperDb from "../config/jobs/amazon-database.job.js";
@@ -12,9 +12,14 @@ export const PageStatus = sequelizePageStatusDB.define('PageStatus', {
     status: {
         type: DataTypes.ENUM(PAGE_STATUS_ARRAY),
         allowNull: false
-    }, errorLog: {
+    },
+    errorLog: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    attempts: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 })
 
